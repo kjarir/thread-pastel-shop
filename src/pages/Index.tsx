@@ -74,7 +74,7 @@ const featuredProducts = [
 ];
 
 const Index = () => {
-  const [viewMode, setViewMode] = useState('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState('featured');
 
   return (

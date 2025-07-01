@@ -22,7 +22,7 @@ import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 
 const Shop = () => {
-  const [viewMode, setViewMode] = useState('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState('featured');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [priceRange, setPriceRange] = useState([0, 200]);
