@@ -17,21 +17,7 @@ import BlogPreview from '@/components/BlogPreview';
 const featuredProducts = [
   {
     id: 1,
-    name: "Vintage Denim Jacket",
-    price: 89.99,
-    originalPrice: 120.00,
-    image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&h=500&fit=crop",
-    category: "Jackets",
-    rating: 4.8,
-    reviews: 124,
-    isNew: true,
-    colors: ["Blue", "Black", "White"],
-    sizes: ["XS", "S", "M", "L", "XL"],
-    tags: ["Bestseller", "Trending"]
-  },
-  {
-    id: 2,
-    name: "Cotton Oversized T-Shirt",
+    name: "Premium Cotton T-Shirt",
     price: 24.99,
     originalPrice: 35.00,
     image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=500&fit=crop",
@@ -42,6 +28,20 @@ const featuredProducts = [
     colors: ["White", "Pink", "Mint", "Lavender"],
     sizes: ["XS", "S", "M", "L", "XL"],
     tags: ["Organic", "Sustainable"]
+  },
+  {
+    id: 2,
+    name: "Classic Denim Shirt",
+    price: 45.99,
+    originalPrice: 65.00,
+    image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop",
+    category: "Shirts",
+    rating: 4.7,
+    reviews: 156,
+    isNew: true,
+    colors: ["Blue", "Black", "White"],
+    sizes: ["XS", "S", "M", "L", "XL"],
+    tags: ["Premium", "Bestseller"]
   },
   {
     id: 3,
@@ -59,17 +59,31 @@ const featuredProducts = [
   },
   {
     id: 4,
-    name: "Floral Summer Dress",
-    price: 65.99,
-    originalPrice: 85.00,
-    image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&h=500&fit=crop",
-    category: "Dresses",
-    rating: 4.7,
+    name: "Comfort Track Pants",
+    price: 35.99,
+    originalPrice: 50.00,
+    image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400&h=500&fit=crop",
+    category: "Track Pants",
+    rating: 4.5,
     reviews: 92,
     isNew: false,
-    colors: ["Floral Pink", "Floral Blue", "Floral Yellow"],
-    sizes: ["XS", "S", "M", "L"],
-    tags: ["Summer", "Limited Edition"]
+    colors: ["Black", "Grey", "Navy"],
+    sizes: ["XS", "S", "M", "L", "XL"],
+    tags: ["Comfortable", "Athletic"]
+  },
+  {
+    id: 5,
+    name: "Essential Hoodie",
+    price: 55.99,
+    originalPrice: 75.00,
+    image: "https://images.unsplash.com/photo-1556821840-3a9fbc86339e?w=400&h=500&fit=crop",
+    category: "Hoodies",
+    rating: 4.8,
+    reviews: 124,
+    isNew: true,
+    colors: ["Black", "Grey", "White", "Pink"],
+    sizes: ["XS", "S", "M", "L", "XL"],
+    tags: ["Bestseller", "Trending"]
   }
 ];
 
@@ -94,13 +108,15 @@ const Index = () => {
                 <span className="block text-rose-500">Premium Fashion</span>
               </h1>
               <p className="text-xl text-gray-600 leading-relaxed">
-                Discover our exclusive collection of sustainable, premium clothing 
-                designed for the modern fashion enthusiast.
+                Discover our exclusive collection of t-shirts, shirts, jeans, track pants, 
+                and hoodies designed for the modern fashion enthusiast.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="bg-rose-400 hover:bg-rose-500 text-white px-8 py-3">
-                  Shop Collection
-                </Button>
+                <Link to="/shop">
+                  <Button size="lg" className="bg-rose-400 hover:bg-rose-500 text-white px-8 py-3">
+                    Shop Collection
+                  </Button>
+                </Link>
                 <Button variant="outline" size="lg" className="border-rose-200 text-rose-600 hover:bg-rose-50 px-8 py-3">
                   View Lookbook
                 </Button>
@@ -111,7 +127,7 @@ const Index = () => {
                   <div className="text-sm text-gray-600">Happy Customers</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">500+</div>
+                  <div className="text-2xl font-bold text-gray-900">100+</div>
                   <div className="text-sm text-gray-600">Products</div>
                 </div>
                 <div className="text-center">
@@ -189,9 +205,11 @@ const Index = () => {
           </div>
           
           <div className="text-center mt-12">
-            <Button variant="outline" size="lg" className="border-rose-200 text-rose-600 hover:bg-rose-50">
-              View All Products
-            </Button>
+            <Link to="/shop">
+              <Button variant="outline" size="lg" className="border-rose-200 text-rose-600 hover:bg-rose-50">
+                View All Products
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

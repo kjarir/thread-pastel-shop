@@ -10,7 +10,6 @@ import {
   Heart, 
   User, 
   Menu, 
-  Bell,
   Gift,
   Truck,
   Shield,
@@ -74,11 +73,6 @@ const Header = () => {
 
           {/* Navigation Icons */}
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="sm" className="hidden md:flex items-center space-x-1">
-              <Bell className="h-5 w-5" />
-              <Badge className="bg-rose-500 text-white text-xs">2</Badge>
-            </Button>
-            
             <Button variant="ghost" size="sm" className="relative">
               <Heart className="h-5 w-5" />
               {wishlistCount > 0 && (
@@ -97,9 +91,11 @@ const Header = () => {
               )}
             </Button>
             
-            <Button variant="ghost" size="sm">
-              <User className="h-5 w-5" />
-            </Button>
+            <Link to="/login">
+              <Button variant="ghost" size="sm">
+                <User className="h-5 w-5" />
+              </Button>
+            </Link>
             
             <Button
               variant="ghost"
@@ -116,15 +112,7 @@ const Header = () => {
         <nav className="hidden md:flex items-center justify-center space-x-8 mt-4 py-4 border-t">
           <Link to="/women" className="text-gray-700 hover:text-rose-600 font-medium">Women</Link>
           <Link to="/men" className="text-gray-700 hover:text-rose-600 font-medium">Men</Link>
-          <Link to="/accessories" className="text-gray-700 hover:text-rose-600 font-medium">Accessories</Link>
-          <Link to="/sale" className="text-rose-600 font-medium flex items-center">
-            Sale <Badge className="ml-2 bg-red-100 text-red-600">-50%</Badge>
-          </Link>
-          <Link to="/new-arrivals" className="text-gray-700 hover:text-rose-600 font-medium flex items-center">
-            New Arrivals <Badge className="ml-2 bg-green-100 text-green-600">New</Badge>
-          </Link>
-          <Link to="/sustainable" className="text-gray-700 hover:text-rose-600 font-medium">Sustainable</Link>
-          <Link to="/blog" className="text-gray-700 hover:text-rose-600 font-medium">Blog</Link>
+          <Link to="/shop" className="text-gray-700 hover:text-rose-600 font-medium">All Products</Link>
         </nav>
 
         {/* Mobile Search */}
@@ -145,11 +133,7 @@ const Header = () => {
             <div className="space-y-4">
               <Link to="/women" className="block text-gray-700 hover:text-rose-600">Women</Link>
               <Link to="/men" className="block text-gray-700 hover:text-rose-600">Men</Link>
-              <Link to="/accessories" className="block text-gray-700 hover:text-rose-600">Accessories</Link>
-              <Link to="/sale" className="block text-rose-600 font-medium">Sale</Link>
-              <Link to="/new-arrivals" className="block text-gray-700 hover:text-rose-600">New Arrivals</Link>
-              <Link to="/sustainable" className="block text-gray-700 hover:text-rose-600">Sustainable</Link>
-              <Link to="/blog" className="block text-gray-700 hover:text-rose-600">Blog</Link>
+              <Link to="/shop" className="block text-gray-700 hover:text-rose-600">All Products</Link>
             </div>
           </div>
         )}

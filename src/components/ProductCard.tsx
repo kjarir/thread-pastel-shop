@@ -1,5 +1,5 @@
-
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -42,20 +42,20 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
     'Mint': 'bg-green-300',
     'Lavender': 'bg-purple-300',
     'Grey': 'bg-gray-400',
-    'Floral Pink': 'bg-gradient-to-r from-pink-300 to-rose-300',
-    'Floral Blue': 'bg-gradient-to-r from-blue-300 to-indigo-300',
-    'Floral Yellow': 'bg-gradient-to-r from-yellow-300 to-orange-300'
+    'Red': 'bg-red-400',
+    'Navy': 'bg-blue-800',
+    'Olive': 'bg-green-600'
   };
 
   if (viewMode === 'list') {
     return (
       <Card className="overflow-hidden hover:shadow-lg transition-shadow">
         <div className="flex">
-          <div className="relative w-48 h-48">
+          <Link to={`/product/${product.id}`} className="relative w-48 h-48">
             <img 
               src={product.image} 
               alt={product.name}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover hover:scale-105 transition-transform"
             />
             {product.isNew && (
               <Badge className="absolute top-2 left-2 bg-green-500 text-white">New</Badge>
@@ -63,7 +63,7 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
             {discount > 0 && (
               <Badge className="absolute top-2 right-2 bg-red-500 text-white">-{discount}%</Badge>
             )}
-          </div>
+          </Link>
           <CardContent className="flex-1 p-6">
             <div className="flex justify-between items-start">
               <div className="flex-1">
@@ -73,13 +73,15 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
                     <Badge key={tag} className="text-xs bg-rose-100 text-rose-600">{tag}</Badge>
                   ))}
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{product.name}</h3>
+                <Link to={`/product/${product.id}`}>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2 hover:text-rose-600 transition-colors">{product.name}</h3>
+                </Link>
                 <div className="flex items-center space-x-2 mb-3">
                   <div className="flex items-center">
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        className={`h-4 w-4 ${
+                        className={`h-3 w-3 ${
                           i < Math.floor(product.rating) 
                             ? 'text-yellow-400 fill-current' 
                             : 'text-gray-300'
@@ -87,7 +89,7 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
                       />
                     ))}
                   </div>
-                  <span className="text-sm text-gray-600">({product.reviews})</span>
+                  <span className="text-xs text-gray-600">({product.reviews})</span>
                 </div>
                 <div className="flex items-center space-x-2 mb-4">
                   <span className="text-xl font-bold text-gray-900">${product.price}</span>
@@ -125,9 +127,11 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
                 >
                   <Heart className={`h-5 w-5 ${isLiked ? 'fill-current' : ''}`} />
                 </Button>
-                <Button variant="ghost" size="sm" className="text-gray-400">
-                  <Eye className="h-5 w-5" />
-                </Button>
+                <Link to={`/product/${product.id}`}>
+                  <Button variant="ghost" size="sm" className="text-gray-400">
+                    <Eye className="h-5 w-5" />
+                  </Button>
+                </Link>
                 <Button variant="ghost" size="sm" className="text-gray-400">
                   <Share className="h-5 w-5" />
                 </Button>
@@ -150,11 +154,13 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="relative overflow-hidden">
-        <img 
-          src={product.image} 
-          alt={product.name}
-          className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
-        />
+        <Link to={`/product/${product.id}`}>
+          <img 
+            src={product.image} 
+            alt={product.name}
+            className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105 cursor-pointer"
+          />
+        </Link>
         
         {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col space-y-2">
@@ -180,9 +186,11 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
           >
             <Heart className={`h-4 w-4 ${isLiked ? 'fill-current' : ''}`} />
           </Button>
-          <Button variant="secondary" size="sm" className="w-10 h-10 rounded-full p-0 bg-white text-gray-600 shadow-md">
-            <Eye className="h-4 w-4" />
-          </Button>
+          <Link to={`/product/${product.id}`}>
+            <Button variant="secondary" size="sm" className="w-10 h-10 rounded-full p-0 bg-white text-gray-600 shadow-md">
+              <Eye className="h-4 w-4" />
+            </Button>
+          </Link>
           <Button variant="secondary" size="sm" className="w-10 h-10 rounded-full p-0 bg-white text-gray-600 shadow-md">
             <Share className="h-4 w-4" />
           </Button>
@@ -207,7 +215,9 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
           ))}
         </div>
 
-        <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">{product.name}</h3>
+        <Link to={`/product/${product.id}`}>
+          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 hover:text-rose-600 transition-colors cursor-pointer">{product.name}</h3>
+        </Link>
         
         <div className="flex items-center space-x-2 mb-3">
           <div className="flex items-center">
