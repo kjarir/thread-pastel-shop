@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,17 +12,19 @@ import {
   Filter, 
   Grid, 
   List, 
-  Star,
-  Heart,
-  ShoppingCart,
-  ChevronDown,
   X
 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
+import { useProducts } from '@/hooks/useProducts';
+import { useCategories } from '@/hooks/useCategories';
 
 const Shop = () => {
+  const [searchParams] = useSearchParams();
+  const categoryParam = searchParams.get('category');
+  const genderParam = searchParams.get('gender');
+  
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState('featured');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -29,29 +32,61 @@ const Shop = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const products = [
-    // ... (same featured products from Index.tsx plus more)
-    {
-      id: 1,
-      name: "Vintage Denim Jacket",
-      price: 89.99,
-      originalPrice: 120.00,
-      image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&h=500&fit=crop",
-      category: "Jackets",
-      rating: 4.8,
-      reviews: 124,
-      isNew: true,
-      colors: ["Blue", "Black", "White"],
-      sizes: ["XS", "S", "M", "L", "XL"],
-      tags: ["Bestseller", "Trending"]
-    },
-    // Add more products here...
-  ];
+  const { data: categories, isLoading: categoriesLoading } = useCategories();
+  const { data: products, isLoading: productsLoading } = useProducts(categoryParam || undefined, genderParam || undefined);
 
-  const categories = ["Tops", "Bottoms", "Dresses", "Jackets", "Accessories", "Shoes"];
-  const colors = ["Black", "White", "Blue", "Pink", "Green", "Red", "Grey", "Yellow"];
-  const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
+  // Filter products based on selected filters
+  const filteredProducts = products?.filter(product => {
+    // Price filter
+    if (product.price < priceRange[0] || product.price > priceRange[1]) {
+      return false;
+    }
+    
+    // Search query filter
+    if (searchQuery && !product.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
+    }
+    
+    // Category filter
+    if (selectedCategories.length > 0) {
+      const productCategory = categories?.find(cat => cat.id === product.category_id);
+      if (!productCategory || !selectedCategories.includes(productCategory.name)) {
+        return false;
+      }
+    }
+    
+    // Colors filter
+    if (selectedColors.length > 0 && product.colors) {
+      const hasSelectedColor = selectedColors.some(color => 
+        product.colors?.includes(color)
+      );
+      if (!hasSelectedColor) {
+        return false;
+      }
+    }
+    
+    // Sizes filter
+    if (selectedSizes.length > 0 && product.sizes) {
+      const hasSelectedSize = selectedSizes.some(size => 
+        product.sizes?.includes(size)
+      );
+      if (!hasSelectedSize) {
+        return false;
+      }
+    }
+    
+    return true;
+  }) || [];
+
+  // Get unique colors and sizes from all products
+  const allColors = Array.from(new Set(products?.flatMap(p => p.colors || []) || []));
+  const allSizes = Array.from(new Set(products?.flatMap(p => p.sizes || []) || []));
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -66,14 +101,16 @@ const Shop = () => {
               Discover our complete collection of premium fashion
             </p>
             <div className="max-w-md mx-auto">
-              <div className="relative">
+              <form onSubmit={handleSearch} className="relative">
                 <Input
                   type="text"
                   placeholder="Search products..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border-gray-200 rounded-full"
                 />
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-              </div>
+              </form>
             </div>
           </div>
         </div>
@@ -113,78 +150,105 @@ const Shop = () => {
               </div>
 
               {/* Categories */}
-              <div className="mb-6">
-                <h4 className="font-medium text-gray-900 mb-3">Categories</h4>
-                <div className="space-y-2">
-                  {categories.map((category) => (
-                    <div key={category} className="flex items-center space-x-2">
-                      <Checkbox 
-                        id={category}
-                        checked={selectedCategories.includes(category)}
-                        onCheckedChange={(checked) => {
-                          if (checked) {
-                            setSelectedCategories([...selectedCategories, category]);
-                          } else {
-                            setSelectedCategories(selectedCategories.filter(c => c !== category));
-                          }
-                        }}
-                      />
-                      <label htmlFor={category} className="text-sm text-gray-700">
-                        {category}
-                      </label>
-                    </div>
-                  ))}
+              {!categoriesLoading && categories && (
+                <div className="mb-6">
+                  <h4 className="font-medium text-gray-900 mb-3">Categories</h4>
+                  <div className="space-y-2">
+                    {categories.map((category) => (
+                      <div key={category.id}>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id={category.id}
+                            checked={selectedCategories.includes(category.name)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setSelectedCategories([...selectedCategories, category.name]);
+                              } else {
+                                setSelectedCategories(selectedCategories.filter(c => c !== category.name));
+                              }
+                            }}
+                          />
+                          <label htmlFor={category.id} className="text-sm text-gray-700">
+                            {category.name}
+                          </label>
+                        </div>
+                        {category.subcategories?.map((sub) => (
+                          <div key={sub.id} className="ml-4 flex items-center space-x-2">
+                            <Checkbox 
+                              id={sub.id}
+                              checked={selectedCategories.includes(sub.name)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setSelectedCategories([...selectedCategories, sub.name]);
+                                } else {
+                                  setSelectedCategories(selectedCategories.filter(c => c !== sub.name));
+                                }
+                              }}
+                            />
+                            <label htmlFor={sub.id} className="text-sm text-gray-600">
+                              {sub.name}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Colors */}
-              <div className="mb-6">
-                <h4 className="font-medium text-gray-900 mb-3">Colors</h4>
-                <div className="grid grid-cols-4 gap-2">
-                  {colors.map((color) => (
-                    <button
-                      key={color}
-                      className={`w-8 h-8 rounded-full border-2 ${
-                        selectedColors.includes(color) 
-                          ? 'border-rose-400' 
-                          : 'border-gray-200'
-                      }`}
-                      style={{ backgroundColor: color.toLowerCase() }}
-                      onClick={() => {
-                        if (selectedColors.includes(color)) {
-                          setSelectedColors(selectedColors.filter(c => c !== color));
-                        } else {
-                          setSelectedColors([...selectedColors, color]);
-                        }
-                      }}
-                    />
-                  ))}
+              {allColors.length > 0 && (
+                <div className="mb-6">
+                  <h4 className="font-medium text-gray-900 mb-3">Colors</h4>
+                  <div className="grid grid-cols-4 gap-2">
+                    {allColors.map((color) => (
+                      <button
+                        key={color}
+                        className={`w-8 h-8 rounded-full border-2 ${
+                          selectedColors.includes(color) 
+                            ? 'border-rose-400' 
+                            : 'border-gray-200'
+                        }`}
+                        style={{ backgroundColor: color.toLowerCase() }}
+                        onClick={() => {
+                          if (selectedColors.includes(color)) {
+                            setSelectedColors(selectedColors.filter(c => c !== color));
+                          } else {
+                            setSelectedColors([...selectedColors, color]);
+                          }
+                        }}
+                        title={color}
+                      />
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Sizes */}
-              <div className="mb-6">
-                <h4 className="font-medium text-gray-900 mb-3">Sizes</h4>
-                <div className="grid grid-cols-3 gap-2">
-                  {sizes.map((size) => (
-                    <Button
-                      key={size}
-                      variant={selectedSizes.includes(size) ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => {
-                        if (selectedSizes.includes(size)) {
-                          setSelectedSizes(selectedSizes.filter(s => s !== size));
-                        } else {
-                          setSelectedSizes([...selectedSizes, size]);
-                        }
-                      }}
-                      className="text-xs"
-                    >
-                      {size}
-                    </Button>
-                  ))}
+              {allSizes.length > 0 && (
+                <div className="mb-6">
+                  <h4 className="font-medium text-gray-900 mb-3">Sizes</h4>
+                  <div className="grid grid-cols-3 gap-2">
+                    {allSizes.map((size) => (
+                      <Button
+                        key={size}
+                        variant={selectedSizes.includes(size) ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => {
+                          if (selectedSizes.includes(size)) {
+                            setSelectedSizes(selectedSizes.filter(s => s !== size));
+                          } else {
+                            setSelectedSizes([...selectedSizes, size]);
+                          }
+                        }}
+                        className="text-xs"
+                      >
+                        {size}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Clear Filters */}
               <Button 
@@ -195,6 +259,7 @@ const Shop = () => {
                   setSelectedCategories([]);
                   setSelectedColors([]);
                   setSelectedSizes([]);
+                  setSearchQuery('');
                 }}
               >
                 Clear All Filters
@@ -216,7 +281,7 @@ const Shop = () => {
                   Filters
                 </Button>
                 <span className="text-gray-600">
-                  Showing {products.length} of {products.length} products
+                  {productsLoading ? 'Loading...' : `Showing ${filteredProducts.length} of ${products?.length || 0} products`}
                 </span>
               </div>
               
@@ -256,26 +321,38 @@ const Shop = () => {
             </div>
 
             {/* Products Grid */}
-            <div className={`grid ${
-              viewMode === 'grid' 
-                ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
-                : 'grid-cols-1'
-            } gap-8`}>
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} viewMode={viewMode} />
-              ))}
-            </div>
+            {productsLoading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="text-lg text-gray-600">Loading products...</div>
+              </div>
+            ) : filteredProducts.length === 0 ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="text-lg text-gray-600">No products found matching your criteria.</div>
+              </div>
+            ) : (
+              <div className={`grid ${
+                viewMode === 'grid' 
+                  ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
+                  : 'grid-cols-1'
+              } gap-8`}>
+                {filteredProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} viewMode={viewMode} />
+                ))}
+              </div>
+            )}
 
             {/* Pagination */}
-            <div className="flex justify-center mt-12">
-              <div className="flex items-center space-x-2">
-                <Button variant="outline" size="sm">Previous</Button>
-                <Button size="sm">1</Button>
-                <Button variant="outline" size="sm">2</Button>
-                <Button variant="outline" size="sm">3</Button>
-                <Button variant="outline" size="sm">Next</Button>
+            {filteredProducts.length > 0 && (
+              <div className="flex justify-center mt-12">
+                <div className="flex items-center space-x-2">
+                  <Button variant="outline" size="sm">Previous</Button>
+                  <Button size="sm">1</Button>
+                  <Button variant="outline" size="sm">2</Button>
+                  <Button variant="outline" size="sm">3</Button>
+                  <Button variant="outline" size="sm">Next</Button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
