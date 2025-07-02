@@ -22,13 +22,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from '@/contexts/AuthContext';
 import { useCategories } from '@/hooks/useCategories';
+import { useCart } from '@/hooks/useCart';
+import { useWishlist } from '@/hooks/useWishlist';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [cartCount] = useState(3);
-  const [wishlistCount] = useState(7);
   const { user, isAdmin, signOut } = useAuth();
   const { data: categories, isLoading } = useCategories();
+  const { cartCount } = useCart();
+  const { wishlistCount } = useWishlist();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -105,23 +107,27 @@ const Header = () => {
 
           {/* Navigation Icons */}
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="sm" className="relative">
-              <Heart className="h-5 w-5" />
-              {wishlistCount > 0 && (
-                <Badge className="absolute -top-2 -right-2 bg-rose-500 text-white text-xs">
-                  {wishlistCount}
-                </Badge>
-              )}
-            </Button>
+            <Link to="/wishlist">
+              <Button variant="ghost" size="sm" className="relative">
+                <Heart className="h-5 w-5" />
+                {wishlistCount > 0 && (
+                  <Badge className="absolute -top-2 -right-2 bg-rose-500 text-white text-xs">
+                    {wishlistCount}
+                  </Badge>
+                )}
+              </Button>
+            </Link>
             
-            <Button variant="ghost" size="sm" className="relative">
-              <ShoppingCart className="h-5 w-5" />
-              {cartCount > 0 && (
-                <Badge className="absolute -top-2 -right-2 bg-rose-500 text-white text-xs">
-                  {cartCount}
-                </Badge>
-              )}
-            </Button>
+            <Link to="/cart">
+              <Button variant="ghost" size="sm" className="relative">
+                <ShoppingCart className="h-5 w-5" />
+                {cartCount > 0 && (
+                  <Badge className="absolute -top-2 -right-2 bg-rose-500 text-white text-xs">
+                    {cartCount}
+                  </Badge>
+                )}
+              </Button>
+            </Link>
             
             {user ? (
               <DropdownMenu>
@@ -141,6 +147,9 @@ const Header = () => {
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/orders">Orders</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/wishlist">Wishlist</Link>
                   </DropdownMenuItem>
                   {isAdmin && (
                     <DropdownMenuItem asChild>
