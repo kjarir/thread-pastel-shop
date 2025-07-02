@@ -2,9 +2,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Heart, ShoppingCart, Star, Eye, Search, Menu, User, Filter, Grid, List } from 'lucide-react';
+import { Star, Grid, List } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
@@ -13,83 +12,15 @@ import FeaturedBanner from '@/components/FeaturedBanner';
 import CategoryGrid from '@/components/CategoryGrid';
 import TestimonialSection from '@/components/TestimonialSection';
 import BlogPreview from '@/components/BlogPreview';
-
-const featuredProducts = [
-  {
-    id: 1,
-    name: "Premium Cotton T-Shirt",
-    price: 24.99,
-    originalPrice: 35.00,
-    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=500&fit=crop",
-    category: "T-Shirts",
-    rating: 4.6,
-    reviews: 89,
-    isNew: false,
-    colors: ["White", "Pink", "Mint", "Lavender"],
-    sizes: ["XS", "S", "M", "L", "XL"],
-    tags: ["Organic", "Sustainable"]
-  },
-  {
-    id: 2,
-    name: "Classic Denim Shirt",
-    price: 45.99,
-    originalPrice: 65.00,
-    image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop",
-    category: "Shirts",
-    rating: 4.7,
-    reviews: 156,
-    isNew: true,
-    colors: ["Blue", "Black", "White"],
-    sizes: ["XS", "S", "M", "L", "XL"],
-    tags: ["Premium", "Bestseller"]
-  },
-  {
-    id: 3,
-    name: "High-Waisted Jeans",
-    price: 75.99,
-    originalPrice: 95.00,
-    image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&h=500&fit=crop",
-    category: "Jeans",
-    rating: 4.9,
-    reviews: 156,
-    isNew: true,
-    colors: ["Blue", "Black", "Grey"],
-    sizes: ["24", "26", "28", "30", "32"],
-    tags: ["Premium", "Bestseller"]
-  },
-  {
-    id: 4,
-    name: "Comfort Track Pants",
-    price: 35.99,
-    originalPrice: 50.00,
-    image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400&h=500&fit=crop",
-    category: "Track Pants",
-    rating: 4.5,
-    reviews: 92,
-    isNew: false,
-    colors: ["Black", "Grey", "Navy"],
-    sizes: ["XS", "S", "M", "L", "XL"],
-    tags: ["Comfortable", "Athletic"]
-  },
-  {
-    id: 5,
-    name: "Essential Hoodie",
-    price: 55.99,
-    originalPrice: 75.00,
-    image: "https://images.unsplash.com/photo-1556821840-3a9fbc86339e?w=400&h=500&fit=crop",
-    category: "Hoodies",
-    rating: 4.8,
-    reviews: 124,
-    isNew: true,
-    colors: ["Black", "Grey", "White", "Pink"],
-    sizes: ["XS", "S", "M", "L", "XL"],
-    tags: ["Bestseller", "Trending"]
-  }
-];
+import { useProducts } from '@/hooks/useProducts';
 
 const Index = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState('featured');
+  const { data: products, isLoading } = useProducts();
+
+  // Take first 5 products as featured
+  const featuredProducts = products?.slice(0, 5) || [];
 
   return (
     <div className="min-h-screen bg-white">
@@ -127,7 +58,7 @@ const Index = () => {
                   <div className="text-sm text-gray-600">Happy Customers</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">100+</div>
+                  <div className="text-2xl font-bold text-gray-900">{products?.length || 0}+</div>
                   <div className="text-sm text-gray-600">Products</div>
                 </div>
                 <div className="text-center">
@@ -198,11 +129,17 @@ const Index = () => {
             </div>
           </div>
           
-          <div className={`grid ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1'} gap-8`}>
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} viewMode={viewMode} />
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="text-center py-8">
+              <p>Loading products...</p>
+            </div>
+          ) : (
+            <div className={`grid ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1'} gap-8`}>
+              {featuredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} viewMode={viewMode} />
+              ))}
+            </div>
+          )}
           
           <div className="text-center mt-12">
             <Link to="/shop">
