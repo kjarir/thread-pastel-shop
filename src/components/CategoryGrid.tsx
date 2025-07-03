@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -6,52 +5,28 @@ import { Badge } from '@/components/ui/badge';
 const categories = [
   {
     id: 1,
-    name: "Women's Fashion",
+    name: "Men's Fashion",
     count: 245,
-    image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=300&fit=crop",
-    href: "/women",
+    image: "https://res.cloudinary.com/dzkfhdhs0/image/upload/v1751536922/fire_2_ydtfwq.png",
+    href: "/shop?category=men",
     featured: true
   },
   {
     id: 2,
-    name: "Men's Clothing",
+    name: "Women's Fashion",
     count: 189,
-    image: "https://images.unsplash.com/photo-1516257984-b1b4d707412e?w=400&h=300&fit=crop",
-    href: "/men",
+    image: "https://res.cloudinary.com/dzkfhdhs0/image/upload/v1751536920/dreams_1_vuqumc.png",
+    href: "/shop?category=women",
     featured: true
   },
   {
     id: 3,
-    name: "Accessories",
+    name: "Kid's Fashion",
     count: 156,
     image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=300&fit=crop",
-    href: "/accessories",
+    href: "/shop?category=kids",
     featured: false
   },
-  {
-    id: 4,
-    name: "Footwear",
-    count: 98,
-    image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=300&fit=crop",
-    href: "/footwear",
-    featured: false
-  },
-  {
-    id: 5,
-    name: "Bags & Purses",
-    count: 124,
-    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=300&fit=crop",
-    href: "/bags",
-    featured: false
-  },
-  {
-    id: 6,
-    name: "Jewelry",
-    count: 87,
-    image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=300&fit=crop",
-    href: "/jewelry",
-    featured: false
-  }
 ];
 
 const CategoryGrid = () => {

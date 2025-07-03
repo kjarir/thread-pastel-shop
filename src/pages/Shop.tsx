@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -47,17 +46,16 @@ const Shop = () => {
       if (normalizedCategory === 'kids' && product.gender !== 'kids') return false;
     }
 
-    // Subcategory filter from URL - improved matching
+    // Subcategory filter from URL - robust normalization
     if (subcategoryParam) {
-      const normalizedSubcategory = subcategoryParam.toLowerCase().replace('-', ' ');
-      const productName = product.name.toLowerCase();
-      
-      // More flexible matching for subcategories
-      if (normalizedSubcategory.includes('shirt') && !productName.includes('shirt')) return false;
-      if (normalizedSubcategory.includes('jeans') && !productName.includes('jeans')) return false;
-      if (normalizedSubcategory.includes('track') && !productName.includes('track')) return false;
-      if (normalizedSubcategory.includes('hoodie') && !productName.includes('hoodie')) return false;
-      if (normalizedSubcategory === 't-shirts' && !productName.includes('t-shirt')) return false;
+      // Normalize: lowercase, remove dashes, remove spaces
+      const normalize = (str: string) => str.toLowerCase().replace(/[-\s]/g, '');
+      const normalizedSubcategory = normalize(subcategoryParam);
+      const productName = normalize(product.name);
+      const productDesc = normalize(product.description || '');
+      if (!productName.includes(normalizedSubcategory) && !productDesc.includes(normalizedSubcategory)) {
+        return false;
+      }
     }
 
     // Price filter
@@ -70,14 +68,22 @@ const Shop = () => {
       return false;
     }
     
-    // Category filter (from sidebar)
+    // Category filter (from sidebar) - simplified logic
     if (selectedCategories.length > 0) {
-      const hasSelectedCategory = selectedCategories.some(cat => 
-        product.name.toLowerCase().includes(cat.toLowerCase()) ||
-        (cat === 'Men' && product.gender === 'men') ||
-        (cat === 'Women' && product.gender === 'women') ||
-        (cat === 'Kids' && product.gender === 'kids')
-      );
+      const hasSelectedCategory = selectedCategories.some(cat => {
+        const catLower = cat.toLowerCase();
+        const productNameLower = product.name.toLowerCase();
+        const productGender = product.gender?.toLowerCase();
+        if ((catLower === 'men' && productGender === 'men') ||
+            (catLower === 'women' && productGender === 'women') ||
+            (catLower === 'kids' && productGender === 'kids')) {
+          return true;
+        }
+        if (productNameLower.includes(catLower)) {
+          return true;
+        }
+        return false;
+      });
       if (!hasSelectedCategory) return false;
     }
     

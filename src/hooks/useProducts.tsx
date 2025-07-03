@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -18,14 +17,14 @@ export interface Product {
   updated_at: string;
 }
 
-// Sample products for demonstration
+// Sample products for demonstration with proper UUID format
 const sampleProducts: Product[] = [
   {
-    id: 'men-tshirt-1',
+    id: '550e8400-e29b-41d4-a716-446655440001',
     name: 'Classic Men\'s T-Shirt',
     description: 'Comfortable cotton t-shirt perfect for everyday wear',
     price: 1299,
-    category_id: 'men-tshirts',
+    category_id: '550e8400-e29b-41d4-a716-446655440010',
     image_url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=500&fit=crop',
     stock_quantity: 50,
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -36,11 +35,11 @@ const sampleProducts: Product[] = [
     updated_at: new Date().toISOString(),
   },
   {
-    id: 'men-shirt-1',
+    id: '550e8400-e29b-41d4-a716-446655440002',
     name: 'Formal Men\'s Shirt',
     description: 'Premium quality formal shirt for office and events',
     price: 2499,
-    category_id: 'men-shirts',
+    category_id: '550e8400-e29b-41d4-a716-446655440011',
     image_url: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400&h=500&fit=crop',
     stock_quantity: 30,
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
@@ -51,11 +50,11 @@ const sampleProducts: Product[] = [
     updated_at: new Date().toISOString(),
   },
   {
-    id: 'men-jeans-1',
+    id: '550e8400-e29b-41d4-a716-446655440003',
     name: 'Men\'s Denim Jeans',
     description: 'Stylish and comfortable denim jeans',
     price: 3999,
-    category_id: 'men-jeans',
+    category_id: '550e8400-e29b-41d4-a716-446655440012',
     image_url: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&h=500&fit=crop',
     stock_quantity: 25,
     sizes: ['28', '30', '32', '34', '36', '38'],
@@ -66,11 +65,11 @@ const sampleProducts: Product[] = [
     updated_at: new Date().toISOString(),
   },
   {
-    id: 'women-tshirt-1',
+    id: '550e8400-e29b-41d4-a716-446655440004',
     name: 'Women\'s Casual T-Shirt',
     description: 'Soft and comfortable t-shirt for women',
     price: 1199,
-    category_id: 'women-tshirts',
+    category_id: '550e8400-e29b-41d4-a716-446655440013',
     image_url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=500&fit=crop',
     stock_quantity: 40,
     sizes: ['XS', 'S', 'M', 'L', 'XL'],
@@ -81,11 +80,11 @@ const sampleProducts: Product[] = [
     updated_at: new Date().toISOString(),
   },
   {
-    id: 'women-shirt-1',
+    id: '550e8400-e29b-41d4-a716-446655440005',
     name: 'Women\'s Formal Shirt',
     description: 'Elegant formal shirt for professional women',
     price: 2299,
-    category_id: 'women-shirts',
+    category_id: '550e8400-e29b-41d4-a716-446655440014',
     image_url: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400&h=500&fit=crop',
     stock_quantity: 35,
     sizes: ['XS', 'S', 'M', 'L', 'XL'],
@@ -96,11 +95,11 @@ const sampleProducts: Product[] = [
     updated_at: new Date().toISOString(),
   },
   {
-    id: 'women-jeans-1',
+    id: '550e8400-e29b-41d4-a716-446655440006',
     name: 'Women\'s Skinny Jeans',
     description: 'Trendy skinny fit jeans for women',
     price: 3599,
-    category_id: 'women-jeans',
+    category_id: '550e8400-e29b-41d4-a716-446655440015',
     image_url: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400&h=500&fit=crop',
     stock_quantity: 20,
     sizes: ['26', '28', '30', '32', '34'],
@@ -111,31 +110,31 @@ const sampleProducts: Product[] = [
     updated_at: new Date().toISOString(),
   },
   {
-    id: 'kids-tshirt-1',
-    name: 'Kids Fun T-Shirt',
-    description: 'Colorful and fun t-shirt for kids',
-    price: 899,
-    category_id: 'kids-tshirts',
-    image_url: 'https://images.unsplash.com/photo-1503944583220-79d8926ad5e2?w=400&h=500&fit=crop',
-    stock_quantity: 60,
-    sizes: ['2-3Y', '4-5Y', '6-7Y', '8-9Y', '10-11Y'],
-    colors: ['Red', 'Blue', 'Yellow', 'Green'],
-    gender: 'kids',
+    id: '550e8400-e29b-41d4-a716-446655440007',
+    name: 'Men\'s Track Pants',
+    description: 'Comfortable track pants for sports and casual wear',
+    price: 1899,
+    category_id: '550e8400-e29b-41d4-a716-446655440016',
+    image_url: 'https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=400&h=500&fit=crop',
+    stock_quantity: 45,
+    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+    colors: ['Black', 'Gray', 'Navy', 'Red'],
+    gender: 'men',
     is_active: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
   {
-    id: 'kids-shirt-1',
-    name: 'Kids Formal Shirt',
-    description: 'Smart formal shirt for special occasions',
-    price: 1499,
-    category_id: 'kids-shirts',
-    image_url: 'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=400&h=500&fit=crop',
+    id: '550e8400-e29b-41d4-a716-446655440008',
+    name: 'Men\'s Hoodie',
+    description: 'Warm and cozy hoodie for cold weather',
+    price: 2999,
+    category_id: '550e8400-e29b-41d4-a716-446655440017',
+    image_url: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=500&fit=crop',
     stock_quantity: 30,
-    sizes: ['2-3Y', '4-5Y', '6-7Y', '8-9Y', '10-11Y'],
-    colors: ['White', 'Light Blue', 'Cream'],
-    gender: 'kids',
+    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+    colors: ['Black', 'Gray', 'Navy', 'Green'],
+    gender: 'men',
     is_active: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -169,6 +168,7 @@ export const useProducts = (categoryId?: string, gender?: string) => {
         
         // If no data from database, return sample products
         if (!data || data.length === 0) {
+          console.log('No products found in database, using sample data');
           return sampleProducts;
         }
         
@@ -211,5 +211,6 @@ export const useProduct = (id: string) => {
         return sampleProduct;
       }
     },
+    enabled: !!id,
   });
 };

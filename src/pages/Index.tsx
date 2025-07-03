@@ -69,7 +69,7 @@ const Index = () => {
             </div>
             <div className="relative">
               <img 
-                src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&h=700&fit=crop" 
+                src="https://res.cloudinary.com/dzkfhdhs0/image/upload/v1751536923/stoicism_1_yzfgzf.png" 
                 alt="Fashion Model"
                 className="rounded-2xl shadow-2xl"
               />
@@ -152,8 +152,8 @@ const Index = () => {
       </section>
 
       <TestimonialSection />
-      <BlogPreview />
-      <Newsletter />
+      {/* <BlogPreview /> */}
+      {/* <Newsletter /> */}
       <Footer />
     </div>
   );
