@@ -52,19 +52,39 @@ export const useCart = () => {
     }) => {
       if (!user) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase
-        .from('cart_items')
-        .upsert({
-          user_id: user.id,
-          product_id: productId,
-          quantity,
-          size,
-          color,
-        })
-        .select();
+      // Check if exact same item (product + size + color combination) exists
+      const existingItem = cartItems.find(item => 
+        item.product_id === productId && 
+        item.size === size && 
+        item.color === color
+      );
 
-      if (error) throw error;
-      return data;
+      if (existingItem) {
+        // Update quantity of existing item
+        const { data, error } = await supabase
+          .from('cart_items')
+          .update({ quantity: existingItem.quantity + quantity })
+          .eq('id', existingItem.id)
+          .select();
+
+        if (error) throw error;
+        return data;
+      } else {
+        // Insert new item
+        const { data, error } = await supabase
+          .from('cart_items')
+          .insert({
+            user_id: user.id,
+            product_id: productId,
+            quantity,
+            size,
+            color,
+          })
+          .select();
+
+        if (error) throw error;
+        return data;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] });
@@ -114,6 +134,22 @@ export const useCart = () => {
     },
   });
 
+  const clearCartMutation = useMutation({
+    mutationFn: async () => {
+      if (!user) throw new Error('Not authenticated');
+      
+      const { error } = await supabase
+        .from('cart_items')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cart'] });
+    },
+  });
+
   const cartTotal = cartItems.reduce((total, item) => {
     return total + (item.product?.price || 0) * item.quantity;
   }, 0);
@@ -128,6 +164,8 @@ export const useCart = () => {
     addToCart: addToCartMutation.mutate,
     updateQuantity: updateQuantityMutation.mutate,
     removeFromCart: removeFromCartMutation.mutate,
+    clearCart: clearCartMutation.mutate,
     isAddingToCart: addToCartMutation.isPending,
+    isClearingCart: clearCartMutation.isPending,
   };
 };
