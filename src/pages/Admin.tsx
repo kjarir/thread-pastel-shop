@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -38,7 +37,7 @@ const Admin = () => {
 
       const orders = ordersRes.data || [];
       const completedOrders = revenueRes.data || [];
-      const totalRevenue = completedOrders.reduce((sum, order) => sum + parseFloat(order.total_amount), 0);
+      const totalRevenue = completedOrders.reduce((sum, order) => sum + Number(order.total_amount), 0);
       
       return {
         totalOrders: orders.length,
