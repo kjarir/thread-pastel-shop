@@ -23,22 +23,36 @@ import { useCategories } from '@/hooks/useCategories';
 const Shop = () => {
   const [searchParams] = useSearchParams();
   const categoryParam = searchParams.get('category');
-  const genderParam = searchParams.get('gender');
+  const subcategoryParam = searchParams.get('subcategory');
   
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState('featured');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [priceRange, setPriceRange] = useState([0, 200]);
+  const [priceRange, setPriceRange] = useState([0, 10000]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
   const { data: categories, isLoading: categoriesLoading } = useCategories();
-  const { data: products, isLoading: productsLoading } = useProducts(categoryParam || undefined, genderParam || undefined);
+  const { data: products, isLoading: productsLoading } = useProducts();
 
-  // Filter products based on selected filters
+  // Filter products based on URL parameters and selected filters
   const filteredProducts = products?.filter(product => {
+    // Gender filter from URL
+    if (categoryParam) {
+      const normalizedCategory = categoryParam.toLowerCase();
+      if (normalizedCategory === 'men' && product.gender !== 'men') return false;
+      if (normalizedCategory === 'women' && product.gender !== 'women') return false;
+      if (normalizedCategory === 'kids' && product.gender !== 'kids') return false;
+    }
+
+    // Subcategory filter from URL
+    if (subcategoryParam) {
+      const normalizedSubcategory = subcategoryParam.toLowerCase().replace('-', ' ');
+      if (!product.name.toLowerCase().includes(normalizedSubcategory)) return false;
+    }
+
     // Price filter
     if (product.price < priceRange[0] || product.price > priceRange[1]) {
       return false;
@@ -49,12 +63,15 @@ const Shop = () => {
       return false;
     }
     
-    // Category filter
+    // Category filter (from sidebar)
     if (selectedCategories.length > 0) {
-      const productCategory = categories?.find(cat => cat.id === product.category_id);
-      if (!productCategory || !selectedCategories.includes(productCategory.name)) {
-        return false;
-      }
+      const hasSelectedCategory = selectedCategories.some(cat => 
+        product.name.toLowerCase().includes(cat.toLowerCase()) ||
+        (cat === 'Men' && product.gender === 'men') ||
+        (cat === 'Women' && product.gender === 'women') ||
+        (cat === 'Kids' && product.gender === 'kids')
+      );
+      if (!hasSelectedCategory) return false;
     }
     
     // Colors filter
@@ -80,12 +97,39 @@ const Shop = () => {
     return true;
   }) || [];
 
+  // Sort products
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    switch (sortBy) {
+      case 'price-low':
+        return a.price - b.price;
+      case 'price-high':
+        return b.price - a.price;
+      case 'newest':
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      default:
+        return 0;
+    }
+  });
+
   // Get unique colors and sizes from all products
   const allColors = Array.from(new Set(products?.flatMap(p => p.colors || []) || []));
   const allSizes = Array.from(new Set(products?.flatMap(p => p.sizes || []) || []));
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+  };
+
+  // Get page title based on URL parameters
+  const getPageTitle = () => {
+    if (categoryParam && subcategoryParam) {
+      const category = categoryParam.charAt(0).toUpperCase() + categoryParam.slice(1);
+      const subcategory = subcategoryParam.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+      return `${category} ${subcategory}`;
+    }
+    if (categoryParam) {
+      return categoryParam.charAt(0).toUpperCase() + categoryParam.slice(1);
+    }
+    return "Shop All Products";
   };
 
   return (
@@ -96,7 +140,7 @@ const Shop = () => {
       <div className="bg-gradient-to-r from-rose-50 to-purple-50 py-12">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Shop All Products</h1>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">{getPageTitle()}</h1>
             <p className="text-lg text-gray-600 mb-6">
               Discover our complete collection of premium fashion
             </p>
@@ -139,13 +183,13 @@ const Shop = () => {
                 <Slider
                   value={priceRange}
                   onValueChange={setPriceRange}
-                  max={500}
-                  step={10}
+                  max={25000}
+                  step={500}
                   className="mb-3"
                 />
                 <div className="flex justify-between text-sm text-gray-600">
-                  <span>${priceRange[0]}</span>
-                  <span>${priceRange[1]}</span>
+                  <span>₹{priceRange[0]}</span>
+                  <span>₹{priceRange[1]}</span>
                 </div>
               </div>
 
@@ -255,7 +299,7 @@ const Shop = () => {
                 variant="outline" 
                 className="w-full"
                 onClick={() => {
-                  setPriceRange([0, 200]);
+                  setPriceRange([0, 10000]);
                   setSelectedCategories([]);
                   setSelectedColors([]);
                   setSelectedSizes([]);
@@ -281,7 +325,7 @@ const Shop = () => {
                   Filters
                 </Button>
                 <span className="text-gray-600">
-                  {productsLoading ? 'Loading...' : `Showing ${filteredProducts.length} of ${products?.length || 0} products`}
+                  {productsLoading ? 'Loading...' : `Showing ${sortedProducts.length} of ${products?.length || 0} products`}
                 </span>
               </div>
               
@@ -325,7 +369,7 @@ const Shop = () => {
               <div className="flex justify-center items-center h-64">
                 <div className="text-lg text-gray-600">Loading products...</div>
               </div>
-            ) : filteredProducts.length === 0 ? (
+            ) : sortedProducts.length === 0 ? (
               <div className="flex justify-center items-center h-64">
                 <div className="text-lg text-gray-600">No products found matching your criteria.</div>
               </div>
@@ -335,14 +379,14 @@ const Shop = () => {
                   ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
                   : 'grid-cols-1'
               } gap-8`}>
-                {filteredProducts.map((product) => (
+                {sortedProducts.map((product) => (
                   <ProductCard key={product.id} product={product} viewMode={viewMode} />
                 ))}
               </div>
             )}
 
             {/* Pagination */}
-            {filteredProducts.length > 0 && (
+            {sortedProducts.length > 0 && (
               <div className="flex justify-center mt-12">
                 <div className="flex items-center space-x-2">
                   <Button variant="outline" size="sm">Previous</Button>

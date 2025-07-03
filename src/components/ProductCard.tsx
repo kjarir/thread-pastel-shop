@@ -160,7 +160,7 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
               </div>
               
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
-                <span className="text-xl sm:text-2xl font-bold text-gray-900">${product.price}</span>
+                <span className="text-xl sm:text-2xl font-bold text-gray-900">₹{product.price}</span>
                 
                 <div className="flex space-x-2">
                   <Button 
@@ -242,7 +242,7 @@ const ProductCard = ({ product, viewMode = 'grid' }: ProductCardProps) => {
           </div>
           
           <div className="flex items-center justify-between mb-3">
-            <span className="text-lg sm:text-xl font-bold text-gray-900">${product.price}</span>
+            <span className="text-lg sm:text-xl font-bold text-gray-900">₹{product.price}</span>
           </div>
           
           <div className="space-y-2 mb-3">
