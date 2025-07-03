@@ -5,166 +5,117 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CreditCard, Lock } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useCart } from '@/hooks/useCart';
-import { useToast } from '@/hooks/use-toast';
 
 interface DummyPaymentGatewayProps {
   total: number;
-  onClose: () => void;
+  onSuccess: () => void;
+  onCancel: () => void;
 }
 
-const DummyPaymentGateway = ({ total, onClose }: DummyPaymentGatewayProps) => {
-  const [isProcessing, setIsProcessing] = useState(false);
+const DummyPaymentGateway = ({ total, onSuccess, onCancel }: DummyPaymentGatewayProps) => {
   const [cardNumber, setCardNumber] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [cvv, setCvv] = useState('');
-  const [cardholderName, setCardholderName] = useState('');
-  const navigate = useNavigate();
-  const { clearCart } = useCart();
-  const { toast } = useToast();
+  const [cardHolder, setCardHolder] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handlePayment = async () => {
-    if (!cardNumber || !expiryDate || !cvv || !cardholderName) {
-      toast({
-        title: "Error",
-        description: "Please fill in all card details",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsProcessing(true);
     
     // Simulate payment processing
     setTimeout(() => {
-      // Simulate successful payment
-      clearCart();
       setIsProcessing(false);
-      toast({
-        title: "Payment Successful!",
-        description: "Your order has been placed successfully.",
-      });
-      navigate('/checkout/success');
-    }, 3000);
-  };
-
-  const formatCardNumber = (value: string) => {
-    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-    const matches = v.match(/\d{4,16}/g);
-    const match = matches && matches[0] || '';
-    const parts = [];
-    for (let i = 0, len = match.length; i < len; i += 4) {
-      parts.push(match.substring(i, i + 4));
-    }
-    if (parts.length) {
-      return parts.join(' ');
-    } else {
-      return v;
-    }
-  };
-
-  const formatExpiryDate = (value: string) => {
-    const v = value.replace(/\D/g, '');
-    if (v.length >= 2) {
-      return v.substring(0, 2) + '/' + v.substring(2, 4);
-    }
-    return v;
+      onSuccess();
+    }, 2000);
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="h-5 w-5" />
-            Secure Payment
-          </CardTitle>
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Lock className="h-4 w-4" />
-            SSL Encrypted
+    <Card className="max-w-md mx-auto">
+      <CardHeader>
+        <CardTitle className="flex items-center space-x-2">
+          <CreditCard className="h-5 w-5" />
+          <span>Payment Gateway</span>
+          <Lock className="h-4 w-4 text-green-500" />
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <div className="flex justify-between items-center">
+            <span className="font-semibold">Total Amount:</span>
+            <span className="text-2xl font-bold text-rose-600">₹{total.toFixed(2)}</span>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="text-lg font-semibold text-center">
-            Total: ${total.toFixed(2)}
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="cardHolder">Card Holder Name</Label>
+            <Input
+              id="cardHolder"
+              placeholder="John Doe"
+              value={cardHolder}
+              onChange={(e) => setCardHolder(e.target.value)}
+            />
           </div>
-          
-          <div className="space-y-4">
+
+          <div>
+            <Label htmlFor="cardNumber">Card Number</Label>
+            <Input
+              id="cardNumber"
+              placeholder="1234 5678 9012 3456"
+              value={cardNumber}
+              onChange={(e) => setCardNumber(e.target.value)}
+              maxLength={19}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="cardNumber">Card Number</Label>
+              <Label htmlFor="expiryDate">Expiry Date</Label>
               <Input
-                id="cardNumber"
-                placeholder="1234 5678 9012 3456"
-                value={cardNumber}
-                onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-                maxLength={19}
-                disabled={isProcessing}
+                id="expiryDate"
+                placeholder="MM/YY"
+                value={expiryDate}
+                onChange={(e) => setExpiryDate(e.target.value)}
+                maxLength={5}
               />
             </div>
-            
             <div>
-              <Label htmlFor="cardholderName">Cardholder Name</Label>
+              <Label htmlFor="cvv">CVV</Label>
               <Input
-                id="cardholderName"
-                placeholder="John Doe"
-                value={cardholderName}
-                onChange={(e) => setCardholderName(e.target.value)}
-                disabled={isProcessing}
+                id="cvv"
+                placeholder="123"
+                value={cvv}
+                onChange={(e) => setCvv(e.target.value)}
+                maxLength={3}
               />
             </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="expiryDate">Expiry Date</Label>
-                <Input
-                  id="expiryDate"
-                  placeholder="MM/YY"
-                  value={expiryDate}
-                  onChange={(e) => setExpiryDate(formatExpiryDate(e.target.value))}
-                  maxLength={5}
-                  disabled={isProcessing}
-                />
-              </div>
-              <div>
-                <Label htmlFor="cvv">CVV</Label>
-                <Input
-                  id="cvv"
-                  placeholder="123"
-                  value={cvv}
-                  onChange={(e) => setCvv(e.target.value.replace(/\D/g, '').substring(0, 3))}
-                  maxLength={3}
-                  disabled={isProcessing}
-                />
-              </div>
-            </div>
           </div>
-          
-          <div className="flex gap-2">
-            <Button
-              onClick={onClose}
-              variant="outline"
-              className="flex-1"
-              disabled={isProcessing}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handlePayment}
-              className="flex-1 bg-rose-500 hover:bg-rose-600"
-              disabled={isProcessing}
-            >
-              {isProcessing ? 'Processing...' : 'Pay Now'}
-            </Button>
-          </div>
-          
-          <div className="text-xs text-gray-500 text-center">
-            This is a dummy payment gateway for demonstration purposes.
-            No real charges will be made.
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+
+        <div className="pt-4 space-y-2">
+          <Button 
+            className="w-full bg-green-600 hover:bg-green-700"
+            onClick={handlePayment}
+            disabled={isProcessing || !cardNumber || !expiryDate || !cvv || !cardHolder}
+          >
+            {isProcessing ? 'Processing Payment...' : `Pay ₹${total.toFixed(2)}`}
+          </Button>
+          <Button 
+            variant="outline" 
+            className="w-full"
+            onClick={onCancel}
+            disabled={isProcessing}
+          >
+            Cancel
+          </Button>
+        </div>
+
+        <div className="text-xs text-gray-500 text-center">
+          <p>🔒 This is a demo payment gateway. No real payment will be processed.</p>
+          <p>Use any test card details to proceed.</p>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

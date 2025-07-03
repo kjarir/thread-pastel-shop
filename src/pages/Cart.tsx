@@ -92,7 +92,7 @@ const Cart = () => {
               Back to Cart
             </Button>
             <DummyPaymentGateway
-              amount={finalTotal}
+              total={finalTotal}
               onSuccess={handlePaymentSuccess}
               onCancel={() => setShowPayment(false)}
             />
@@ -145,15 +145,14 @@ const Cart = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {cartItems.map((item) => (
-                    <div key={`${item.product.id}-${item.size || 'no-size'}-${item.color || 'no-color'}`} className="flex items-center space-x-4 py-4 border-b">
+                    <div key={`${item.product_id}-${item.size || 'no-size'}-${item.color || 'no-color'}`} className="flex items-center space-x-4 py-4 border-b">
                       <img 
-                        src={item.product.image_url || 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=500&fit=crop'} 
-                        alt={item.product.name}
+                        src={item.product?.image_url || 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=500&fit=crop'} 
+                        alt={item.product?.name}
                         className="w-20 h-20 object-cover rounded-lg"
                       />
                       <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900">{item.product.name}</h3>
-                        <p className="text-sm text-gray-600">{item.product.description}</p>
+                        <h3 className="font-semibold text-gray-900">{item.product?.name}</h3>
                         <div className="flex items-center space-x-4 mt-2">
                           {item.size && (
                             <Badge variant="outline">Size: {item.size}</Badge>
@@ -167,7 +166,7 @@ const Cart = () => {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => updateQuantity(item.product.id, item.quantity - 1, item.size, item.color)}
+                              onClick={() => updateQuantity({ itemId: item.id, quantity: item.quantity - 1 })}
                               disabled={item.quantity <= 1}
                             >
                               <Minus className="h-4 w-4" />
@@ -176,17 +175,17 @@ const Cart = () => {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => updateQuantity(item.product.id, item.quantity + 1, item.size, item.color)}
+                              onClick={() => updateQuantity({ itemId: item.id, quantity: item.quantity + 1 })}
                             >
                               <Plus className="h-4 w-4" />
                             </Button>
                           </div>
                           <div className="flex items-center space-x-4">
-                            <span className="font-semibold">₹{(item.product.price * item.quantity).toFixed(2)}</span>
+                            <span className="font-semibold">₹{((item.product?.price || 0) * item.quantity).toFixed(2)}</span>
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => removeFromCart(item.product.id, item.size, item.color)}
+                              onClick={() => removeFromCart(item.id)}
                             >
                               <Trash2 className="h-4 w-4 text-red-500" />
                             </Button>

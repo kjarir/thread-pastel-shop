@@ -28,7 +28,7 @@ const Shop = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState('featured');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [priceRange, setPriceRange] = useState([0, 10000]);
+  const [priceRange, setPriceRange] = useState([0, 25000]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
@@ -47,10 +47,17 @@ const Shop = () => {
       if (normalizedCategory === 'kids' && product.gender !== 'kids') return false;
     }
 
-    // Subcategory filter from URL
+    // Subcategory filter from URL - improved matching
     if (subcategoryParam) {
       const normalizedSubcategory = subcategoryParam.toLowerCase().replace('-', ' ');
-      if (!product.name.toLowerCase().includes(normalizedSubcategory)) return false;
+      const productName = product.name.toLowerCase();
+      
+      // More flexible matching for subcategories
+      if (normalizedSubcategory.includes('shirt') && !productName.includes('shirt')) return false;
+      if (normalizedSubcategory.includes('jeans') && !productName.includes('jeans')) return false;
+      if (normalizedSubcategory.includes('track') && !productName.includes('track')) return false;
+      if (normalizedSubcategory.includes('hoodie') && !productName.includes('hoodie')) return false;
+      if (normalizedSubcategory === 't-shirts' && !productName.includes('t-shirt')) return false;
     }
 
     // Price filter
@@ -299,7 +306,7 @@ const Shop = () => {
                 variant="outline" 
                 className="w-full"
                 onClick={() => {
-                  setPriceRange([0, 10000]);
+                  setPriceRange([0, 25000]);
                   setSelectedCategories([]);
                   setSelectedColors([]);
                   setSelectedSizes([]);
