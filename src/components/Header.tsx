@@ -9,9 +9,9 @@ import {
   ShoppingCart, 
   Heart, 
   User, 
-  Menu, 
   ChevronDown,
   LogOut,
+  Menu,
   X
 } from 'lucide-react';
 import {
@@ -22,14 +22,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from '@/contexts/AuthContext';
-import { useCategories } from '@/hooks/useCategories';
 import { useCart } from '@/hooks/useCart';
 import { useWishlist } from '@/hooks/useWishlist';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, isAdmin, signOut } = useAuth();
-  const { data: categories, isLoading } = useCategories();
   const { cartCount } = useCart();
   const { wishlistCount } = useWishlist();
   const navigate = useNavigate();
@@ -39,77 +37,72 @@ const Header = () => {
     navigate('/');
   };
 
+  // Categories data
+  const categories = [
+    {
+      name: 'Men',
+      items: ['T-Shirts', 'Shirts', 'Jeans', 'Track Pants', 'Hoodies']
+    },
+    {
+      name: 'Women',
+      items: ['T-Shirts', 'Shirts', 'Jeans', 'Track Pants', 'Hoodies']
+    },
+    {
+      name: 'Kids',
+      items: ['T-Shirts', 'Shirts', 'Jeans', 'Track Pants', 'Hoodies']
+    }
+  ];
+
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
       {/* Main Header */}
       <div className="container mx-auto px-4 py-3 sm:py-4">
         <div className="flex items-center justify-between">
-          {/* Left side - Categories and Logo */}
-          <div className="flex items-center space-x-2 sm:space-x-6">
-            {/* Categories Dropdown - Hidden on mobile */}
-            <div className="hidden md:block">
-              <DropdownMenu>
+          {/* Logo */}
+          <Link to="/" className="text-xl sm:text-2xl font-bold text-gray-900">
+            404 <span className="text-rose-500">Thread</span>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-8">
+            {categories.map((category) => (
+              <DropdownMenu key={category.name}>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center space-x-1">
-                    <Menu className="h-4 w-4" />
-                    <span>Categories</span>
+                  <Button variant="ghost" className="flex items-center space-x-1 text-gray-700 hover:text-rose-600">
+                    <span>{category.name}</span>
                     <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-48">
-                  {isLoading ? (
-                    <DropdownMenuItem disabled>Loading...</DropdownMenuItem>
-                  ) : (
-                    categories?.map((category) => (
-                      <div key={category.id}>
-                        <DropdownMenuItem asChild>
-                          <Link 
-                            to={`/shop?category=${category.slug}`}
-                            className="font-medium"
-                          >
-                            {category.name}
-                          </Link>
-                        </DropdownMenuItem>
-                        {category.subcategories?.map((sub) => (
-                          <DropdownMenuItem key={sub.id} asChild>
-                            <Link 
-                              to={`/shop?category=${sub.slug}`}
-                              className="pl-4 text-sm text-gray-600"
-                            >
-                              {sub.name}
-                            </Link>
-                          </DropdownMenuItem>
-                        ))}
-                        {category.subcategories && category.subcategories.length > 0 && (
-                          <DropdownMenuSeparator />
-                        )}
-                      </div>
-                    ))
-                  )}
+                <DropdownMenuContent align="start" className="w-48 bg-white">
+                  {category.items.map((item) => (
+                    <DropdownMenuItem key={item} asChild>
+                      <Link 
+                        to={`/shop?category=${category.name.toLowerCase()}&subcategory=${item.toLowerCase().replace(' ', '-')}`}
+                        className="text-gray-600 hover:text-rose-600"
+                      >
+                        {item}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
                 </DropdownMenuContent>
               </DropdownMenu>
-            </div>
+            ))}
+          </nav>
 
-            {/* Logo */}
-            <Link to="/" className="text-xl sm:text-2xl font-bold text-gray-900">
-              404 <span className="text-rose-500">Thread</span>
-            </Link>
-          </div>
-
-          {/* Search Bar - Hidden on mobile */}
-          <div className="hidden lg:flex flex-1 max-w-md mx-8">
-            <div className="relative w-full">
-              <Input
-                type="text"
-                placeholder="Search products..."
-                className="w-full pl-10 pr-4 py-2 border-gray-200 rounded-full focus:border-rose-300"
-              />
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            </div>
-          </div>
-
-          {/* Navigation Icons */}
+          {/* Right Side Icons */}
           <div className="flex items-center space-x-2 sm:space-x-4">
+            {/* Search */}
+            <div className="hidden lg:flex">
+              <div className="relative">
+                <Input
+                  type="text"
+                  placeholder="Search..."
+                  className="w-64 pl-10 pr-4 py-2 border-gray-200 rounded-full focus:border-rose-300"
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              </div>
+            </div>
+
             <Link to="/wishlist">
               <Button variant="ghost" size="sm" className="relative">
                 <Heart className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -141,7 +134,7 @@ const Header = () => {
                       <ChevronDown className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
+                  <DropdownMenuContent align="end" className="bg-white">
                     <DropdownMenuItem>
                       <span className="font-medium">{user.email}</span>
                     </DropdownMenuItem>
@@ -237,24 +230,17 @@ const Header = () => {
               
               {/* Categories for mobile */}
               <div className="space-y-2">
-                <div className="text-sm font-medium text-gray-700 mb-2">Categories</div>
-                {categories?.map((category) => (
-                  <div key={category.id}>
-                    <Link 
-                      to={`/shop?category=${category.slug}`}
-                      className="block text-sm text-gray-600 hover:text-rose-600 font-medium py-1"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      {category.name}
-                    </Link>
-                    {category.subcategories?.map((sub) => (
+                {categories.map((category) => (
+                  <div key={category.name}>
+                    <div className="text-sm font-medium text-gray-700 mb-2">{category.name}</div>
+                    {category.items.map((item) => (
                       <Link
-                        key={sub.id}
-                        to={`/shop?category=${sub.slug}`}
+                        key={item}
+                        to={`/shop?category=${category.name.toLowerCase()}&subcategory=${item.toLowerCase().replace(' ', '-')}`}
                         className="block ml-4 text-sm text-gray-500 hover:text-rose-600 py-1"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        {sub.name}
+                        {item}
                       </Link>
                     ))}
                   </div>
